@@ -1,0 +1,1591 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pick Our Date</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@500;700;800;900&display=swap");
+
+    :root {
+      color-scheme: light;
+      --ink: #342130;
+      --muted: #806d78;
+      --line: #f0d8e5;
+      --paper: #fff8fb;
+      --panel: #ffffff;
+      --blush: #ffddec;
+      --rose: #ff9dc5;
+      --peach: #ffd4b8;
+      --butter: #fff1ae;
+      --lavender: #ddd3ff;
+      --mint: #d9f5df;
+      --sky: #dff3ff;
+      --focus: #b83c7d;
+      --shadow: 0 28px 80px rgba(115, 50, 86, 0.18);
+      font-family: Nunito, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 14% 12%, rgba(255, 221, 236, 0.95), transparent 25rem),
+        radial-gradient(circle at 88% 18%, rgba(221, 211, 255, 0.82), transparent 24rem),
+        radial-gradient(circle at 22% 86%, rgba(217, 245, 223, 0.75), transparent 22rem),
+        linear-gradient(135deg, rgba(255, 248, 251, 0.92), rgba(255, 241, 174, 0.35) 48%, rgba(223, 243, 255, 0.72)),
+        var(--paper);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::before {
+      background-image:
+        radial-gradient(circle, rgba(255, 157, 197, 0.9) 0 2px, transparent 3px),
+        radial-gradient(circle, rgba(184, 60, 125, 0.45) 0 1px, transparent 2px),
+        radial-gradient(circle, rgba(255, 212, 184, 0.85) 0 2px, transparent 3px);
+      background-size: 118px 118px, 156px 156px, 204px 204px;
+      animation: sparkleDrift 18s linear infinite;
+      opacity: 0.7;
+    }
+
+    body::after {
+      background:
+        linear-gradient(115deg, transparent 0 44%, rgba(255, 255, 255, 0.38) 48%, transparent 52% 100%);
+      transform: translateX(-80%);
+      animation: softShine 8s ease-in-out infinite;
+    }
+
+    a {
+      color: var(--focus);
+      text-underline-offset: 0.18em;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 120px;
+    }
+
+    .hero {
+      min-height: 26vh;
+      display: grid;
+      align-items: end;
+      padding: 48px 0 24px;
+    }
+
+    .hero h1 {
+      max-width: 820px;
+      margin: 0;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(3rem, 9vw, 6.9rem);
+      line-height: 0.86;
+      letter-spacing: 0;
+      color: #4a233e;
+      text-shadow: 0 10px 34px rgba(255, 157, 197, 0.38);
+    }
+
+    .hero p {
+      max-width: 680px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 1.14rem;
+      line-height: 1.55;
+      font-weight: 800;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 24px;
+      align-items: start;
+      margin-top: 28px;
+    }
+
+    .questions,
+    .sidebar {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section,
+    .result,
+    .spot-list {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .section {
+      display: none;
+      min-height: 590px;
+      padding: clamp(20px, 4vw, 34px);
+      position: relative;
+      overflow: hidden;
+      transform-origin: center;
+    }
+
+    .section.active {
+      display: block;
+      animation: cardFloatIn 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(255, 157, 197, 0.22), transparent 18rem),
+        radial-gradient(circle at bottom left, rgba(255, 241, 174, 0.26), transparent 18rem);
+      pointer-events: none;
+    }
+
+    .section-head {
+      position: relative;
+      display: grid;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    h2,
+    h3 {
+      margin: 0;
+      letter-spacing: 0;
+      line-height: 1.08;
+    }
+
+    h2 {
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(2.1rem, 5vw, 3.8rem);
+      color: #4a233e;
+    }
+
+    h3 {
+      font-size: 1rem;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .options {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .options.single {
+      grid-template-columns: 1fr;
+    }
+
+    .choice {
+      position: relative;
+      min-height: 112px;
+    }
+
+    .choice input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .choice span {
+      display: grid;
+      gap: 6px;
+      height: 100%;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(103, 45, 77, 0.08);
+      transition: border-color 180ms ease, transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .choice strong {
+      line-height: 1.2;
+      font-size: 1.05rem;
+      color: #432038;
+    }
+
+    .choice small {
+      color: var(--muted);
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .choice input:checked + span {
+      border-color: var(--focus);
+      background: linear-gradient(135deg, rgba(255, 221, 236, 0.96), rgba(255, 241, 174, 0.72), rgba(223, 243, 255, 0.78));
+      box-shadow: 0 18px 42px rgba(184, 60, 125, 0.18);
+      transform: translateY(-3px) rotate(-0.25deg);
+    }
+
+    .choice input:checked + span::after {
+      content: "picked";
+      width: fit-content;
+      margin-top: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #4a233e;
+      color: #fff;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .choice input:focus-visible + span,
+    .text-field:focus-visible,
+    .action:focus-visible {
+      outline: 3px solid rgba(17, 79, 101, 0.28);
+      outline-offset: 2px;
+    }
+
+    .text-field {
+      width: 100%;
+      min-height: 96px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--ink);
+    }
+
+    .custom-line {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .custom-line label {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .short-field {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 11px 12px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--ink);
+    }
+
+    .date-picker-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .date-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 34px;
+      margin-top: 12px;
+    }
+
+    .date-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 4px 5px 4px 11px;
+      border: 1px solid rgba(184, 60, 125, 0.2);
+      border-radius: 999px;
+      background: rgba(255, 221, 236, 0.78);
+      color: #4a233e;
+      font-weight: 900;
+      font-size: 0.88rem;
+    }
+
+    .date-pill button {
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(74, 35, 62, 0.12);
+      color: #4a233e;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .wizard-progress {
+      display: grid;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: 0 14px 34px rgba(115, 50, 86, 0.1);
+      backdrop-filter: blur(14px);
+    }
+
+    .step-label {
+      color: var(--muted);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+    }
+
+    .step-dots {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .step-dot {
+      height: 9px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 157, 197, 0.32);
+      cursor: pointer;
+      transition: background 180ms ease, transform 180ms ease;
+    }
+
+    .step-dot.active {
+      background: linear-gradient(90deg, #ff72b0, #ffd36e);
+      transform: scaleY(1.35);
+    }
+
+    .wizard-nav {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 14px 34px rgba(115, 50, 86, 0.1);
+      backdrop-filter: blur(14px);
+    }
+
+    .wizard-nav .action {
+      min-width: 130px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 15px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #b83c7d, #ff72b0);
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: 0 12px 28px rgba(184, 60, 125, 0.2);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(184, 60, 125, 0.26);
+    }
+
+    .action.secondary {
+      background: rgba(255, 255, 255, 0.84);
+      color: var(--ink);
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
+    .result {
+      position: sticky;
+      top: 16px;
+      padding: 18px;
+    }
+
+    .result-card {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 8px;
+      background: linear-gradient(160deg, #ffffff, #fff4f9);
+      border: 1px solid var(--line);
+    }
+
+    .result-row {
+      display: grid;
+      gap: 3px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .value {
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .value small {
+      display: inline-block;
+      margin-top: 3px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .timeline {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.5;
+    }
+
+    .spot-list {
+      overflow: hidden;
+    }
+
+    .spot-list header {
+      padding: 18px 18px 0;
+    }
+
+    .spot {
+      display: grid;
+      gap: 5px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .spot:first-of-type {
+      border-top: 0;
+    }
+
+    .spot strong {
+      line-height: 1.2;
+    }
+
+    .spot p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--rose);
+      color: #5c2145;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .toast {
+      min-height: 20px;
+      margin-top: 10px;
+      color: var(--focus);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .footer {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .music-widget {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10;
+      width: min(360px, calc(100vw - 28px));
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 26px 70px rgba(115, 50, 86, 0.24);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+    }
+
+    .music-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, rgba(255, 221, 236, 0.94), rgba(255, 241, 174, 0.72));
+    }
+
+    .music-title {
+      display: grid;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .music-title strong {
+      font-size: 0.94rem;
+      line-height: 1.1;
+    }
+
+    .music-title small {
+      color: var(--muted);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .music-toggle {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 999px;
+      background: #4a233e;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .music-note {
+      padding: 12px 14px 14px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .music-widget.collapsed .music-note {
+      display: none;
+    }
+
+    .spotify-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      margin: 12px 14px 0;
+      border-radius: 999px;
+      background: #1db954;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 900;
+      box-shadow: 0 12px 26px rgba(29, 185, 84, 0.22);
+    }
+
+    .music-widget.collapsed .spotify-link {
+      display: none;
+    }
+
+    @keyframes cardFloatIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes sparkleDrift {
+      from {
+        background-position: 0 0, 30px 20px, 10px 80px;
+      }
+      to {
+        background-position: 118px 118px, 186px 176px, 214px 284px;
+      }
+    }
+
+    @keyframes softShine {
+      0%, 48% {
+        transform: translateX(-90%);
+        opacity: 0;
+      }
+      58% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(90%);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .result {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 22px, 1120px);
+        padding-top: 14px;
+      }
+
+      .hero {
+        min-height: 28vh;
+        padding-top: 28px;
+      }
+
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 17px;
+      }
+
+      .section-head {
+        display: grid;
+        gap: 7px;
+      }
+
+      .action {
+        width: 100%;
+      }
+
+      .wizard-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .wizard-nav .action {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .date-picker-row {
+        grid-template-columns: 1fr;
+      }
+
+      .music-widget {
+        right: 10px;
+        bottom: 10px;
+        width: min(340px, calc(100vw - 20px));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="music-widget" id="musicWidget">
+    <div class="music-head">
+      <div class="music-title">
+        <strong>our Blend playlist</strong>
+        <small>opens directly in Spotify</small>
+      </div>
+      <button class="music-toggle" type="button" id="musicToggle" aria-label="Collapse Spotify player">-</button>
+    </div>
+    <a class="spotify-link" href="https://open.spotify.com/playlist/37i9dQZF1EJEC49q0CZDmO?si=1a92e85905da42cb" target="_blank" rel="noreferrer">Open the Blend</a>
+    <div class="music-note">Spotify will not publicly embed this Blend playlist, so this avoids the broken “Page not found” player and opens it in Spotify instead.</div>
+  </div>
+
+  <main class="shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title">pick our little date</h1>
+        <p>One cute choice at a time. Pick the food, vibe, activity, view, games, timing, and any custom ideas, then send the finished plan back.</p>
+      </div>
+    </section>
+
+    <div class="layout">
+      <form id="dateForm" class="questions">
+        <div class="wizard-progress" aria-label="Date picker progress">
+          <div class="step-label" id="stepLabel">Step 1 of 8</div>
+          <div class="step-dots" id="stepDots"></div>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>first stop?</h2>
+            <p class="hint">Food before anything else, obviously.</p>
+          </div>
+          <div class="options">
+            <label class="choice">
+              <input type="radio" name="foodStop" value="Woolworths Warringah Mall" data-detail="Snack run at Woolies, Brookvale, then head out." checked>
+              <span><strong>Woolies first</strong><small>Classic Brookvale snack shop: drinks, fruit, chocolate, easy picnic food.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="foodStop" value="Woolies + bakery/cafe add-on" data-detail="Woolies for picnic basics, then add coffee or a pastry nearby.">
+              <span><strong>Woolies plus coffee</strong><small>Still practical, but with a cute little treat stop.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="foodStop" value="Make it a proper picnic shop" data-detail="Woolies for a full picnic spread: savoury, sweet, drinks, blanket energy.">
+              <span><strong>Full picnic shop</strong><small>Cheese, crackers, berries, dip, bread, drinks, dessert.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="foodStop" value="Skip shopping, grab takeaway" data-detail="Keep it simple: quick takeaway, then go straight to the spot.">
+              <span><strong>Takeaway instead</strong><small>If shopping feels like effort, go straight to food and views.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="foodStop" value="Custom food stop" data-detail="She wants to choose the food stop.">
+              <span><strong>Custom</strong><small>She can type the food idea below.</small></span>
+            </label>
+          </div>
+          <div class="custom-line">
+            <label for="foodCustom">Custom food idea</label>
+            <input class="short-field" id="foodCustom" name="foodCustom" placeholder="Example: sushi, hot chips, ice cream, make food at home">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>what vibe?</h2>
+            <p class="hint">This decides how soft, chaotic, or lowkey the date feels.</p>
+          </div>
+          <div class="options">
+            <label class="choice">
+              <input type="radio" name="vibe" value="Sunset lookout picnic" data-detail="Low effort but romantic: food, view, sunset, and no over-planning." checked>
+              <span><strong>Sunset lookout</strong><small>Pretty view, snacks, sit and talk.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="vibe" value="Beach walk + snacks" data-detail="Start with a gentle walk, then sit somewhere nice with food.">
+              <span><strong>Beach walk</strong><small>Long Reef, Dee Why, Freshwater, or Manly direction.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="vibe" value="Super lowkey chill" data-detail="No pressure: blanket, drinks, maybe music, easy place to leave whenever.">
+              <span><strong>Lowkey chill</strong><small>Quiet reserve, car lookout, or beach grass.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="vibe" value="Mini adventure" data-detail="A proper little outing: drive, explore, view, food, then optional dessert.">
+              <span><strong>Mini adventure</strong><small>A bit more effort, better story.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="vibe" value="Custom vibe" data-detail="She wants to set the whole vibe herself.">
+              <span><strong>Custom</strong><small>Type the mood, dress code, or any special idea below.</small></span>
+            </label>
+          </div>
+          <div class="custom-line">
+            <label for="vibeCustom">Custom vibe</label>
+            <input class="short-field" id="vibeCustom" name="vibeCustom" placeholder="Example: cozy, chaotic, cute, competitive, no planning">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>main activity?</h2>
+            <p class="hint">Optional if she wants more than just sitting and talking.</p>
+          </div>
+          <div class="options" id="activityOptions"></div>
+          <div class="custom-line">
+            <label for="activityCustom">Custom activity</label>
+            <input class="short-field" id="activityCustom" name="activityCustom" placeholder="Example: arcade, thrift challenge, bake-off, night swim, anything she wants">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>where are we going?</h2>
+            <p class="hint">Defaults are near Brookvale and the Northern Beaches.</p>
+          </div>
+          <div class="options single" id="viewOptions"></div>
+          <div class="custom-line">
+            <label for="viewCustom">Custom spot</label>
+            <input class="short-field" id="viewCustom" name="viewCustom" placeholder="Example: her favourite beach, your car spot, somewhere private">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>if we sit down?</h2>
+            <p class="hint">Games or a creative thing while you chill.</p>
+          </div>
+          <div class="options" id="gameOptions"></div>
+          <div class="custom-line">
+            <label for="gameCustom">Custom game</label>
+            <input class="short-field" id="gameCustom" name="gameCustom" placeholder="Example: truth questions, dares, card game she knows, made-up scoring rules">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>backup plan?</h2>
+            <p class="hint">Useful if wind, crowds, or effort changes the mood.</p>
+          </div>
+          <div class="options" id="backupOptions"></div>
+          <div class="custom-line">
+            <label for="backupCustom">Custom backup</label>
+            <input class="short-field" id="backupCustom" name="backupCustom" placeholder="Example: stay in, drive around, beach car park, her house, your house">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>are you free tomorrow?</h2>
+            <p class="hint">If not, she can add one or more dates that work.</p>
+          </div>
+          <div class="options">
+            <label class="choice">
+              <input type="radio" name="availability" value="Yes, tomorrow works" data-detail="She is free tomorrow." checked>
+              <span><strong>Yes, tomorrow</strong><small>Lock it in for tomorrow.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="availability" value="No, choose other dates" data-detail="She will choose the dates she is free.">
+              <span><strong>Not tomorrow</strong><small>Pick a few dates that work instead.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="availability" value="Maybe tomorrow" data-detail="Tomorrow might work, but she wants backup dates too.">
+              <span><strong>Maybe</strong><small>Keep tomorrow as an option and add backups.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="availability" value="Custom availability" data-detail="She wants to explain availability herself.">
+              <span><strong>Custom</strong><small>Type any scheduling note below.</small></span>
+            </label>
+          </div>
+          <div class="custom-line">
+            <label for="dateInput">Add free dates</label>
+            <div class="date-picker-row">
+              <input class="short-field" id="dateInput" type="date">
+              <button class="action secondary" type="button" id="addDateBtn">Add date</button>
+            </div>
+            <div class="date-list" id="dateList" aria-live="polite"></div>
+          </div>
+          <div class="custom-line">
+            <label for="availabilityCustom">Custom availability note</label>
+            <input class="short-field" id="availabilityCustom" name="availabilityCustom" placeholder="Example: tomorrow night only, next weekend, any weekday after 6">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>what time?</h2>
+            <p class="hint">Pick the easiest rhythm.</p>
+          </div>
+          <div class="options">
+            <label class="choice">
+              <input type="radio" name="timing" value="Late afternoon into sunset" data-detail="Shop around 4:30, arrive before sunset, stay while it is pretty." checked>
+              <span><strong>Sunset</strong><small>Best for views and snacks.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="timing" value="Easy afternoon" data-detail="No rush: food first, then walk or sit somewhere nice.">
+              <span><strong>Afternoon</strong><small>More relaxed, less timing pressure.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="timing" value="Night drive" data-detail="Grab food, find a lookout, keep it cozy and lowkey.">
+              <span><strong>Night drive</strong><small>Better for car chats and quiet views.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="timing" value="Spontaneous" data-detail="Decide on the day and use the chosen spot list as the menu.">
+              <span><strong>Spontaneous</strong><small>Choose the vibe now, figure out the clock later.</small></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="timing" value="Custom timing" data-detail="She wants to choose the timing herself.">
+              <span><strong>Custom</strong><small>She can type the time or rough plan below.</small></span>
+            </label>
+          </div>
+          <div class="custom-line">
+            <label for="timingCustom">Custom timing</label>
+            <input class="short-field" id="timingCustom" name="timingCustom" placeholder="Example: after dinner, late night, Sunday morning, decide last minute">
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>anything else?</h2>
+            <p class="hint">Anything that would make it better.</p>
+          </div>
+          <textarea class="text-field" name="note" placeholder="Example: bring a blanket, no long walk, get strawberries, avoid windy spots, dessert after..."></textarea>
+        </section>
+
+        <div class="wizard-nav">
+          <button class="action secondary" type="button" id="backBtn">Back</button>
+          <button class="action" type="button" id="nextBtn">Next</button>
+          <button class="action" type="button" id="finishBtn" hidden>Make the plan</button>
+          <button class="action secondary" type="reset">Reset</button>
+        </div>
+      </form>
+
+      <aside class="sidebar">
+        <section class="result" aria-live="polite">
+          <h2>your plan</h2>
+          <p class="hint">It updates while she picks. Finish unlocks the send-back buttons.</p>
+          <div class="result-card" id="resultCard"></div>
+          <div class="actions" id="shareActions" hidden>
+            <button class="action" type="button" id="shareBtn">Share result</button>
+            <a class="action secondary" id="smsBtn" href="#">Open SMS</a>
+            <button class="action secondary" type="button" id="copyBtn">Copy text</button>
+            <button class="action secondary" type="button" id="downloadBtn">Download screenshot</button>
+          </div>
+          <div class="toast" id="toast"></div>
+        </section>
+
+        <section class="spot-list">
+          <header>
+            <h2>quick links</h2>
+            <p class="hint">Open any spot in Maps before choosing.</p>
+          </header>
+          <div id="quickLinks"></div>
+        </section>
+      </aside>
+    </div>
+
+    <p class="footer">Tip: after she taps “Make the plan”, she can use Share, SMS, Copy, or Download screenshot to send the result back. The app stores the latest finished plan on this device only.</p>
+  </main>
+
+  <script>
+    const mapLink = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+
+    const views = [
+      {
+        name: "Governor Phillip Lookout",
+        detail: "Closest proper lookout energy: Beacon Hill, 360-degree views, very easy after Brookvale.",
+        tag: "near Brookvale",
+        map: mapLink("Governor Phillip Lookout Beacon Hill NSW")
+      },
+      {
+        name: "Long Reef Headland",
+        detail: "Coastal walk, ocean view, good sunset picnic pick if the weather is calm.",
+        tag: "coastal",
+        map: mapLink("Long Reef Headland NSW")
+      },
+      {
+        name: "North Head / Fairfax Lookout",
+        detail: "Bigger drive, bigger payoff: harbour, skyline, cliffs, and whale-season lookout energy.",
+        tag: "big view",
+        map: mapLink("North Head Fairfax Lookout Manly NSW")
+      },
+      {
+        name: "Freshwater Beach grass",
+        detail: "Easy beach sit, close enough to keep the night casual, good if a walk feels like too much.",
+        tag: "low effort",
+        map: mapLink("Freshwater Beach NSW")
+      },
+      {
+        name: "Dee Why Headland / rockpool",
+        detail: "Beach, headland path, rockpool, food nearby if the Woolies plan changes.",
+        tag: "walk + sit",
+        map: mapLink("Dee Why Headland NSW")
+      },
+      {
+        name: "Manly Dam",
+        detail: "Quiet water, trees, picnic feel, less exposed than the beach on windy days.",
+        tag: "calm",
+        map: mapLink("Manly Dam NSW")
+      },
+      {
+        name: "Search: secret view spots nearby",
+        detail: "A flexible Maps search for hidden lookouts around Brookvale and the Northern Beaches.",
+        tag: "wildcard",
+        map: mapLink("secret lookout view spots near Brookvale NSW")
+      }
+    ];
+
+    const activities = [
+      {
+        name: "Paint each other on blank canvases",
+        detail: "Buy two blank canvases and paints, sit somewhere, then reveal the final portraits at the end.",
+        tag: "creative",
+        map: mapLink("art supplies near Brookvale NSW")
+      },
+      {
+        name: "Tennis",
+        detail: "Fun if she wants a lightly competitive activity before food or sunset.",
+        tag: "active",
+        map: mapLink("tennis courts near Brookvale NSW")
+      },
+      {
+        name: "Mini golf",
+        detail: "A little boring, but easy and unserious if she wants something simple.",
+        tag: "easy",
+        map: mapLink("mini golf near Brookvale NSW")
+      },
+      {
+        name: "Friend matchmaking side quest",
+        detail: "Bring her friends and your friends, then secretly try to matchmake as the side entertainment.",
+        tag: "group",
+        map: mapLink("casual group activities near Brookvale NSW")
+      },
+      {
+        name: "Arcade or bowling search",
+        detail: "If she wants something louder and less sit-down.",
+        tag: "fun",
+        map: mapLink("arcade bowling near Brookvale NSW")
+      },
+      {
+        name: "No activity, just chill",
+        detail: "Keep it simple: Woolies, view, games, talking, and no forced schedule.",
+        tag: "lowkey",
+        map: mapLink("quiet places to chill near Brookvale NSW")
+      },
+      {
+        name: "Custom activity",
+        detail: "She wants to choose the activity herself.",
+        tag: "custom",
+        map: mapLink("fun activities near Brookvale NSW")
+      }
+    ];
+
+    const games = [
+      {
+        name: "Cards",
+        detail: "Bring a deck and either play normal games or make rules up as you go.",
+        tag: "cards",
+        map: mapLink("playing cards Woolworths Warringah Mall")
+      },
+      {
+        name: "Make our own game",
+        detail: "Invent rules together: points, dares, questions, penalties, rewards.",
+        tag: "custom",
+        map: mapLink("Woolworths Warringah Mall Brookvale")
+      },
+      {
+        name: "Connect 4",
+        detail: "Easy, quick, competitive, and works sitting on a blanket or table.",
+        tag: "board game",
+        map: mapLink("Connect 4 near Brookvale NSW")
+      },
+      {
+        name: "Painting reveal",
+        detail: "Use the two-canvas painting idea as the sit-down game and reveal the final result.",
+        tag: "paint",
+        map: mapLink("blank canvas paint near Brookvale NSW")
+      },
+      {
+        name: "Question game",
+        detail: "Cute questions, spicy questions, would-you-rather, or whatever level she chooses.",
+        tag: "talking",
+        map: mapLink("quiet picnic spot near Brookvale NSW")
+      },
+      {
+        name: "No game",
+        detail: "Just food, view, music, and talking.",
+        tag: "simple",
+        map: mapLink("quiet lookout near Brookvale NSW")
+      },
+      {
+        name: "Custom game",
+        detail: "She can type any game or rule idea she wants.",
+        tag: "custom",
+        map: mapLink("games near Brookvale NSW")
+      }
+    ];
+
+    const backups = [
+      {
+        name: "Bilarong Reserve",
+        detail: "Narrabeen Lagoon, shade, picnic tables, easy lowkey backup.",
+        tag: "lagoon",
+        map: mapLink("Bilarong Reserve Narrabeen NSW")
+      },
+      {
+        name: "Shelly Beach",
+        detail: "Sheltered Manly option with calm water and sit-down picnic energy.",
+        tag: "sheltered",
+        map: mapLink("Shelly Beach Manly NSW")
+      },
+      {
+        name: "Clontarf Reserve",
+        detail: "Harbour-side grass, picnic tables, quieter date feel.",
+        tag: "harbour",
+        map: mapLink("Clontarf Reserve NSW")
+      },
+      {
+        name: "McCarrs Creek Reserve",
+        detail: "Water views and fig-tree shade if you want a slower afternoon.",
+        tag: "quiet",
+        map: mapLink("McCarrs Creek Reserve NSW")
+      },
+      {
+        name: "Stay local in the car",
+        detail: "Grab Woolies snacks, find a calm park/beach car spot, music and chat.",
+        tag: "lowest effort",
+        map: mapLink("quiet park near Brookvale NSW")
+      },
+      {
+        name: "Dessert after",
+        detail: "Keep the date flexible: view first, then find dessert or hot chips nearby.",
+        tag: "add-on",
+        map: mapLink("dessert near Brookvale NSW")
+      }
+    ];
+
+    const form = document.querySelector("#dateForm");
+    const activityOptions = document.querySelector("#activityOptions");
+    const viewOptions = document.querySelector("#viewOptions");
+    const gameOptions = document.querySelector("#gameOptions");
+    const backupOptions = document.querySelector("#backupOptions");
+    const quickLinks = document.querySelector("#quickLinks");
+    const resultCard = document.querySelector("#resultCard");
+    const shareActions = document.querySelector("#shareActions");
+    const toast = document.querySelector("#toast");
+    const smsBtn = document.querySelector("#smsBtn");
+    const sections = Array.from(form.querySelectorAll(".section"));
+    const stepDots = document.querySelector("#stepDots");
+    const stepLabel = document.querySelector("#stepLabel");
+    const backBtn = document.querySelector("#backBtn");
+    const nextBtn = document.querySelector("#nextBtn");
+    const finishBtn = document.querySelector("#finishBtn");
+    const musicWidget = document.querySelector("#musicWidget");
+    const musicToggle = document.querySelector("#musicToggle");
+    const dateInput = document.querySelector("#dateInput");
+    const addDateBtn = document.querySelector("#addDateBtn");
+    const dateList = document.querySelector("#dateList");
+    let currentStep = 0;
+    let freeDates = [];
+
+    function optionMarkup(item, groupName, checked) {
+      return `
+        <label class="choice">
+          <input type="radio" name="${groupName}" value="${item.name}" data-detail="${item.detail.replaceAll('"', "&quot;")}" data-map="${item.map}" ${checked ? "checked" : ""}>
+          <span>
+            <strong>${item.name}</strong>
+            <small>${item.detail}</small>
+            <small><a href="${item.map}" target="_blank" rel="noreferrer">Open map</a></small>
+          </span>
+        </label>`;
+    }
+
+    activityOptions.innerHTML = activities.map((item, index) => optionMarkup(item, "activity", index === 0)).join("");
+    viewOptions.innerHTML = views.map((item, index) => optionMarkup(item, "view", index === 0)).join("");
+    gameOptions.innerHTML = games.map((item, index) => optionMarkup(item, "game", index === 0)).join("");
+    backupOptions.innerHTML = backups.map((item, index) => optionMarkup(item, "backup", index === 0)).join("");
+
+    stepDots.innerHTML = sections.map((_, index) => `<button class="step-dot" type="button" aria-label="Go to step ${index + 1}"></button>`).join("");
+    const dots = Array.from(stepDots.querySelectorAll(".step-dot"));
+
+    quickLinks.innerHTML = [
+      {
+        name: "Woolworths Warringah Mall",
+        detail: "Food stop in Brookvale before the date.",
+        tag: "food",
+        map: mapLink("Woolworths Warringah Mall Brookvale")
+      },
+      ...activities,
+      ...views,
+      ...games,
+      ...backups
+    ].map((item) => `
+      <article class="spot">
+        <span class="tag">${item.tag}</span>
+        <strong><a href="${item.map}" target="_blank" rel="noreferrer">${item.name}</a></strong>
+        <p>${item.detail}</p>
+      </article>
+    `).join("");
+
+    function selected(name) {
+      const input = form.querySelector(`input[name="${name}"]:checked`);
+      return {
+        value: input?.value || "",
+        detail: input?.dataset.detail || "",
+        map: input?.dataset.map || ""
+      };
+    }
+
+    function customValue(name) {
+      return new FormData(form).get(name)?.trim() || "";
+    }
+
+    function todayInSydney() {
+      const buildToday = new Date(2026, 5, 12);
+      const parts = new Intl.DateTimeFormat("en-AU", {
+        timeZone: "Australia/Sydney",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(new Date());
+      const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+      const runtimeToday = new Date(Number(values.year), Number(values.month) - 1, Number(values.day));
+      return runtimeToday > buildToday ? runtimeToday : buildToday;
+    }
+
+    function isoTomorrow() {
+      const date = todayInSydney();
+      date.setDate(date.getDate() + 1);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatDate(isoDate) {
+      if (!isoDate) {
+        return "";
+      }
+      const [year, month, day] = isoDate.split("-").map(Number);
+      return new Date(year, month - 1, day).toLocaleDateString([], {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function renderDates() {
+      dateList.innerHTML = freeDates.length
+        ? freeDates.map((date) => `
+          <span class="date-pill">
+            ${formatDate(date)}
+            <button type="button" data-date="${date}" aria-label="Remove ${formatDate(date)}">x</button>
+          </span>
+        `).join("")
+        : `<span class="hint">No extra dates added yet.</span>`;
+    }
+
+    function addFreeDate(date) {
+      if (!date || freeDates.includes(date)) {
+        return;
+      }
+      freeDates = [...freeDates, date].sort();
+      renderDates();
+      render();
+    }
+
+    function withCustom(selection, custom, label) {
+      if (!custom) {
+        return selection;
+      }
+      if (selection.value.toLowerCase().includes("custom")) {
+        return {
+          ...selection,
+          value: custom,
+          detail: "Custom response."
+        };
+      }
+      return {
+        ...selection,
+        value: selection.value,
+        detail: `${selection.detail} ${label}: ${custom}`
+      };
+    }
+
+    function currentPlan() {
+      return {
+        foodStop: withCustom(selected("foodStop"), customValue("foodCustom"), "custom food"),
+        vibe: withCustom(selected("vibe"), customValue("vibeCustom"), "custom vibe"),
+        activity: withCustom(selected("activity"), customValue("activityCustom"), "custom activity"),
+        view: withCustom(selected("view"), customValue("viewCustom"), "custom spot"),
+        game: withCustom(selected("game"), customValue("gameCustom"), "custom game"),
+        backup: withCustom(selected("backup"), customValue("backupCustom"), "custom backup"),
+        availability: withCustom(selected("availability"), customValue("availabilityCustom"), "custom availability"),
+        freeDates: [...freeDates],
+        tomorrow: isoTomorrow(),
+        timing: withCustom(selected("timing"), customValue("timingCustom"), "custom timing"),
+        note: new FormData(form).get("note")?.trim() || "No extra notes."
+      };
+    }
+
+    function availabilityText(plan) {
+      const dateText = plan.freeDates.length
+        ? `Free dates: ${plan.freeDates.map(formatDate).join(", ")}.`
+        : "No extra dates chosen.";
+      return `${plan.availability.value} - ${plan.availability.detail} Tomorrow is ${formatDate(plan.tomorrow)}. ${dateText}`;
+    }
+
+    function planText(plan) {
+      return [
+        "Date plan picked:",
+        `Food first: ${plan.foodStop.value} - ${plan.foodStop.detail}`,
+        `Vibe: ${plan.vibe.value} - ${plan.vibe.detail}`,
+        `Activity: ${plan.activity.value} - ${plan.activity.detail}`,
+        plan.activity.map ? `Activity map/search: ${plan.activity.map}` : "",
+        `Main spot: ${plan.view.value} - ${plan.view.detail}`,
+        plan.view.map ? `Main spot map: ${plan.view.map}` : "",
+        `Sit-down game: ${plan.game.value} - ${plan.game.detail}`,
+        plan.game.map ? `Game/supplies map/search: ${plan.game.map}` : "",
+        `Backup: ${plan.backup.value} - ${plan.backup.detail}`,
+        plan.backup.map ? `Backup map: ${plan.backup.map}` : "",
+        `Availability: ${availabilityText(plan)}`,
+        `Timing: ${plan.timing.value} - ${plan.timing.detail}`,
+        `Notes: ${plan.note}`
+      ].filter(Boolean).join("\n");
+    }
+
+    function render() {
+      const plan = currentPlan();
+      resultCard.innerHTML = `
+        <div class="result-row">
+          <div class="label">Food first</div>
+          <div class="value">${escapeHtml(plan.foodStop.value)}<br><small>${escapeHtml(plan.foodStop.detail)}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Vibe</div>
+          <div class="value">${escapeHtml(plan.vibe.value)}<br><small>${escapeHtml(plan.vibe.detail)}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Activity</div>
+          <div class="value">${escapeHtml(plan.activity.value)}${plan.activity.map ? ` · <a href="${plan.activity.map}" target="_blank" rel="noreferrer">Map/search</a>` : ""}<br><small>${escapeHtml(plan.activity.detail)}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Main spot</div>
+          <div class="value">${escapeHtml(plan.view.value)}${plan.view.map ? ` · <a href="${plan.view.map}" target="_blank" rel="noreferrer">Map</a>` : ""}<br><small>${escapeHtml(plan.view.detail)}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Sit-down game</div>
+          <div class="value">${escapeHtml(plan.game.value)}${plan.game.map ? ` · <a href="${plan.game.map}" target="_blank" rel="noreferrer">Map/search</a>` : ""}<br><small>${escapeHtml(plan.game.detail)}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Backup</div>
+          <div class="value">${escapeHtml(plan.backup.value)}${plan.backup.map ? ` · <a href="${plan.backup.map}" target="_blank" rel="noreferrer">Map</a>` : ""}<br><small>${escapeHtml(plan.backup.detail)}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Timing</div>
+          <div class="value">${escapeHtml(plan.timing.value)}<br><small>${escapeHtml(plan.timing.detail)}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Availability</div>
+          <div class="value">${escapeHtml(plan.availability.value)}<br><small>${escapeHtml(availabilityText(plan))}</small></div>
+        </div>
+        <div class="result-row">
+          <div class="label">Mini itinerary</div>
+          <ol class="timeline">
+            <li>Meet and do the food stop.</li>
+            <li>Do ${escapeHtml(plan.activity.value)}.</li>
+            <li>Head to ${escapeHtml(plan.view.value)}.</li>
+            <li>If sitting down, play/do ${escapeHtml(plan.game.value)}.</li>
+            <li>If the mood changes, switch to ${escapeHtml(plan.backup.value)}.</li>
+            <li>Optional dessert, hot chips, or drive after.</li>
+          </ol>
+        </div>
+        <div class="result-row">
+          <div class="label">Notes</div>
+          <div class="value">${escapeHtml(plan.note)}</div>
+        </div>
+      `;
+
+      const encoded = encodeURIComponent(planText(plan));
+      smsBtn.href = `sms:?&body=${encoded}`;
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function finishPlan() {
+      const plan = currentPlan();
+      localStorage.setItem("lastDatePlan", JSON.stringify({ plan, savedAt: new Date().toISOString() }));
+      shareActions.hidden = false;
+      toast.textContent = "Plan made. Send it back with Share, SMS, Copy, or Download screenshot.";
+      resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function showStep(index) {
+      currentStep = Math.max(0, Math.min(index, sections.length - 1));
+      sections.forEach((section, sectionIndex) => {
+        section.classList.toggle("active", sectionIndex === currentStep);
+      });
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle("active", dotIndex === currentStep);
+      });
+      stepLabel.textContent = `Step ${currentStep + 1} of ${sections.length}`;
+      backBtn.disabled = currentStep === 0;
+      nextBtn.hidden = currentStep === sections.length - 1;
+      finishBtn.hidden = currentStep !== sections.length - 1;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function sharePlan() {
+      const text = planText(currentPlan());
+      if (navigator.share) {
+        await navigator.share({ title: "Date plan", text });
+        toast.textContent = "Shared.";
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      toast.textContent = "Sharing is not available here, so the plan was copied.";
+    }
+
+    async function copyPlan() {
+      await navigator.clipboard.writeText(planText(currentPlan()));
+      toast.textContent = "Copied the result text.";
+    }
+
+    function wrapLines(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = String(text).split(/\s+/);
+      let line = "";
+      words.forEach((word) => {
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line, x, y);
+          line = word;
+          y += lineHeight;
+        } else {
+          line = test;
+        }
+      });
+      if (line) {
+        ctx.fillText(line, x, y);
+        y += lineHeight;
+      }
+      return y;
+    }
+
+    function drawScreenshot() {
+      const plan = currentPlan();
+      const canvas = document.createElement("canvas");
+      const scale = 2;
+      canvas.width = 900 * scale;
+      canvas.height = 1600 * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = "#fbfaf6";
+      ctx.fillRect(0, 0, 900, 1600);
+      ctx.fillStyle = "#dbeaf0";
+      ctx.fillRect(0, 0, 900, 190);
+      ctx.fillStyle = "#dce8d5";
+      ctx.fillRect(0, 190, 900, 28);
+
+      ctx.fillStyle = "#17201d";
+      ctx.font = "700 56px system-ui, sans-serif";
+      ctx.fillText("Date plan picked", 54, 108);
+      ctx.font = "400 22px system-ui, sans-serif";
+      ctx.fillStyle = "#5f6c68";
+      ctx.fillText(new Date().toLocaleString([], { dateStyle: "medium", timeStyle: "short" }), 56, 150);
+
+      const rows = [
+        ["Food first", `${plan.foodStop.value}: ${plan.foodStop.detail}`],
+        ["Vibe", `${plan.vibe.value}: ${plan.vibe.detail}`],
+        ["Activity", `${plan.activity.value}: ${plan.activity.detail}`],
+        ["Main spot", `${plan.view.value}: ${plan.view.detail}`],
+        ["Sit-down game", `${plan.game.value}: ${plan.game.detail}`],
+        ["Backup", `${plan.backup.value}: ${plan.backup.detail}`],
+        ["Availability", availabilityText(plan)],
+        ["Timing", `${plan.timing.value}: ${plan.timing.detail}`],
+        ["Notes", plan.note]
+      ];
+
+      let y = 282;
+      rows.forEach(([label, value]) => {
+        ctx.fillStyle = "#75856d";
+        ctx.font = "800 17px system-ui, sans-serif";
+        ctx.fillText(label.toUpperCase(), 56, y);
+        y += 34;
+        ctx.fillStyle = "#17201d";
+        ctx.font = "500 26px system-ui, sans-serif";
+        y = wrapLines(ctx, value, 56, y, 780, 34) + 24;
+      });
+
+      ctx.fillStyle = "#114f65";
+      ctx.font = "700 22px system-ui, sans-serif";
+      ctx.fillText("Mini itinerary", 56, y + 12);
+      y += 56;
+      ctx.fillStyle = "#17201d";
+      ctx.font = "500 24px system-ui, sans-serif";
+      [
+        "1. Meet and do the food stop.",
+        `2. Do ${plan.activity.value}.`,
+        `3. Head to ${plan.view.value}.`,
+        `4. Sit-down game: ${plan.game.value}.`,
+        `5. Backup option: ${plan.backup.value}.`,
+        "6. Optional dessert, hot chips, or drive after."
+      ].forEach((line) => {
+        y = wrapLines(ctx, line, 56, y, 780, 32) + 8;
+      });
+
+      const link = document.createElement("a");
+      link.download = "date-plan-result.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast.textContent = "Downloaded screenshot.";
+    }
+
+    form.addEventListener("input", render);
+    form.addEventListener("reset", () => {
+      setTimeout(() => {
+        freeDates = [];
+        dateInput.value = "";
+        renderDates();
+        shareActions.hidden = true;
+        toast.textContent = "";
+        showStep(0);
+        render();
+      }, 0);
+    });
+    addDateBtn.addEventListener("click", () => {
+      addFreeDate(dateInput.value);
+      form.querySelector('input[name="availability"][value="No, choose other dates"]').checked = true;
+      dateInput.value = "";
+      render();
+    });
+    dateInput.addEventListener("change", () => {
+      if (dateInput.value) {
+        form.querySelector('input[name="availability"][value="No, choose other dates"]').checked = true;
+        render();
+      }
+    });
+    dateList.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-date]");
+      if (!button) {
+        return;
+      }
+      freeDates = freeDates.filter((date) => date !== button.dataset.date);
+      renderDates();
+      render();
+    });
+    backBtn.addEventListener("click", () => showStep(currentStep - 1));
+    nextBtn.addEventListener("click", () => showStep(currentStep + 1));
+    dots.forEach((dot, index) => dot.addEventListener("click", () => showStep(index)));
+    finishBtn.addEventListener("click", finishPlan);
+    musicToggle.addEventListener("click", () => {
+      musicWidget.classList.toggle("collapsed");
+      musicToggle.textContent = musicWidget.classList.contains("collapsed") ? "+" : "-";
+      musicToggle.setAttribute("aria-label", musicWidget.classList.contains("collapsed") ? "Expand Spotify player" : "Collapse Spotify player");
+    });
+    document.querySelector("#shareBtn").addEventListener("click", () => sharePlan().catch(() => {
+      toast.textContent = "Could not open share. Try Copy text or SMS.";
+    }));
+    document.querySelector("#copyBtn").addEventListener("click", () => copyPlan().catch(() => {
+      toast.textContent = "Copy failed. Try SMS or screenshot.";
+    }));
+    document.querySelector("#downloadBtn").addEventListener("click", drawScreenshot);
+
+    render();
+    dateInput.min = isoTomorrow();
+    dateInput.value = isoTomorrow();
+    renderDates();
+    showStep(0);
+  </script>
+</body>
+</html>
