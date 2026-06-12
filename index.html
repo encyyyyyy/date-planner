@@ -114,22 +114,17 @@
     }
 
     .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 390px;
-      gap: 24px;
-      align-items: start;
-      margin-top: 28px;
+      width: min(780px, 100%);
+      margin: 28px auto 0;
     }
 
-    .questions,
-    .sidebar {
+    .questions {
       display: grid;
       gap: 18px;
     }
 
     .section,
-    .result,
-    .spot-list {
+    .result {
       background: rgba(255, 255, 255, 0.82);
       border: 1px solid var(--line);
       border-radius: 22px;
@@ -465,9 +460,13 @@
     }
 
     .result {
-      position: sticky;
-      top: 16px;
-      padding: 18px;
+      display: none;
+      padding: clamp(20px, 4vw, 34px);
+      animation: cardFloatIn 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .result:not([hidden]) {
+      display: block;
     }
 
     .result-card {
@@ -511,37 +510,6 @@
       line-height: 1.5;
     }
 
-    .spot-list {
-      overflow: hidden;
-    }
-
-    .spot-list header {
-      padding: 18px 18px 0;
-    }
-
-    .spot {
-      display: grid;
-      gap: 5px;
-      padding: 14px 18px;
-      border-top: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.7);
-    }
-
-    .spot:first-of-type {
-      border-top: 0;
-    }
-
-    .spot strong {
-      line-height: 1.2;
-    }
-
-    .spot p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
     .tag {
       display: inline-flex;
       width: fit-content;
@@ -559,13 +527,6 @@
       color: var(--focus);
       font-size: 0.9rem;
       font-weight: 700;
-    }
-
-    .footer {
-      margin-top: 22px;
-      color: var(--muted);
-      font-size: 0.86rem;
-      line-height: 1.45;
     }
 
     .music-widget {
@@ -689,16 +650,6 @@
       }
       51%, 100% {
         opacity: 0;
-      }
-    }
-
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .result {
-        position: static;
       }
     }
 
@@ -973,14 +924,11 @@
         </section>
 
         <div class="wizard-nav">
-          <button class="action secondary" type="button" id="backBtn">Back</button>
-          <button class="action" type="button" id="nextBtn">Next</button>
-          <button class="action" type="button" id="finishBtn" hidden>Make the plan</button>
+          <button class="action secondary" type="button" id="backBtn" onclick="window.goBack(event)">Back</button>
+          <button class="action" type="button" id="nextBtn" onclick="window.primaryAction(event)">Next</button>
           <button class="action secondary" type="reset">Reset</button>
         </div>
-      </form>
 
-      <aside class="sidebar">
         <section class="result" id="resultPanel" aria-live="polite" hidden>
           <h2>our plan</h2>
           <p class="hint">Here is what you picked. Send it back to me so I know the plan.</p>
@@ -993,18 +941,8 @@
           </div>
           <div class="toast" id="toast"></div>
         </section>
-
-        <section class="spot-list">
-          <header>
-            <h2>quick links</h2>
-            <p class="hint">Open any spot in Maps before choosing.</p>
-          </header>
-          <div id="quickLinks"></div>
-        </section>
-      </aside>
+      </form>
     </div>
-
-    <p class="footer">Tip: after you tap “Make the plan”, use Share, SMS, Copy, or Download screenshot to send the result back to me. The app stores the latest finished plan on this device only.</p>
   </main>
 
   <script>
@@ -1189,7 +1127,6 @@
     const viewOptions = document.querySelector("#viewOptions");
     const gameOptions = document.querySelector("#gameOptions");
     const backupOptions = document.querySelector("#backupOptions");
-    const quickLinks = document.querySelector("#quickLinks");
     const resultCard = document.querySelector("#resultCard");
     const resultPanel = document.querySelector("#resultPanel");
     const shareActions = document.querySelector("#shareActions");
@@ -1200,7 +1137,6 @@
     const stepLabel = document.querySelector("#stepLabel");
     const backBtn = document.querySelector("#backBtn");
     const nextBtn = document.querySelector("#nextBtn");
-    const finishBtn = document.querySelector("#finishBtn");
     const musicWidget = document.querySelector("#musicWidget");
     const musicToggle = document.querySelector("#musicToggle");
     const dateInput = document.querySelector("#dateInput");
@@ -1239,25 +1175,6 @@
         choice.classList.add("option-hidden");
       });
     });
-
-    quickLinks.innerHTML = [
-      {
-        name: "Woolworths Warringah Mall",
-        detail: "Food stop in Brookvale before the date.",
-        tag: "food",
-        map: mapLink("Woolworths Warringah Mall Brookvale")
-      },
-      ...activities,
-      ...views,
-      ...games,
-      ...backups
-    ].map((item) => `
-      <article class="spot">
-        <span class="tag">${item.tag}</span>
-        <strong><a href="${item.map}" target="_blank" rel="noreferrer">${item.name}</a></strong>
-        <p>${item.detail}</p>
-      </article>
-    `).join("");
 
     function selected(name) {
       const input = form.querySelector(`input[name="${name}"]:checked`);
@@ -1455,10 +1372,19 @@
     function finishPlan() {
       const plan = currentPlan();
       localStorage.setItem("lastDatePlan", JSON.stringify({ plan, savedAt: new Date().toISOString() }));
+      animationRun += 1;
+      sections.forEach((section) => section.classList.remove("active"));
+      document.querySelector(".wizard-progress").hidden = true;
+      document.querySelector(".wizard-nav").hidden = true;
       resultPanel.hidden = false;
       shareActions.hidden = false;
       toast.textContent = "Plan made. Send it back to me with Share, SMS, Copy, or Download screenshot.";
-      resultPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function handleFinish(event) {
+      event?.preventDefault();
+      finishPlan();
     }
 
     function sleep(ms) {
@@ -1527,8 +1453,7 @@
       });
       stepLabel.textContent = `Step ${currentStep + 1} of ${sections.length}`;
       backBtn.disabled = currentStep === 0;
-      nextBtn.hidden = currentStep === sections.length - 1;
-      finishBtn.hidden = currentStep !== sections.length - 1;
+      nextBtn.textContent = currentStep === sections.length - 1 ? "Make the plan" : "Next";
       window.scrollTo({ top: 0, behavior: "smooth" });
       animateStep(sections[currentStep]);
     }
@@ -1646,6 +1571,8 @@
         dateInput.value = "";
         renderDates();
         resultPanel.hidden = true;
+        document.querySelector(".wizard-progress").hidden = false;
+        document.querySelector(".wizard-nav").hidden = false;
         shareActions.hidden = true;
         toast.textContent = "";
         showStep(0);
@@ -1673,10 +1600,20 @@
       renderDates();
       render();
     });
-    backBtn.addEventListener("click", () => showStep(currentStep - 1));
-    nextBtn.addEventListener("click", () => showStep(currentStep + 1));
+    window.goBack = (event) => {
+      event?.preventDefault();
+      showStep(currentStep - 1);
+    };
+    window.primaryAction = (event) => {
+      event?.preventDefault();
+      if (currentStep === sections.length - 1) {
+        handleFinish(event);
+        return;
+      }
+      showStep(currentStep + 1);
+    };
     dots.forEach((dot, index) => dot.addEventListener("click", () => showStep(index)));
-    finishBtn.addEventListener("click", finishPlan);
+    form.addEventListener("submit", handleFinish);
     musicToggle.addEventListener("click", () => {
       musicWidget.classList.toggle("collapsed");
       musicToggle.textContent = musicWidget.classList.contains("collapsed") ? "+" : "-";
