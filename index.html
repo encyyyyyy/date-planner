@@ -731,7 +731,7 @@
     <section class="hero" aria-labelledby="page-title">
       <div>
         <h1 id="page-title">pick our little date</h1>
-        <p>One cute choice at a time. Pick the food, vibe, activity, view, games, timing, and any custom ideas, then send the finished plan back.</p>
+        <p>One cute choice at a time. Pick what you want us to do, add any custom ideas, then send the finished plan back to me.</p>
       </div>
     </section>
 
@@ -765,8 +765,8 @@
               <span><strong>Takeaway instead</strong><small>If shopping feels like effort, go straight to food and views.</small></span>
             </label>
             <label class="choice">
-              <input type="radio" name="foodStop" value="Custom food stop" data-detail="She wants to choose the food stop.">
-              <span><strong>Custom</strong><small>She can type the food idea below.</small></span>
+              <input type="radio" name="foodStop" value="Custom food stop" data-detail="You want to choose the food stop.">
+              <span><strong>Custom</strong><small>You can type the food idea below.</small></span>
             </label>
           </div>
           <div class="custom-line">
@@ -798,7 +798,7 @@
               <span><strong>Mini adventure</strong><small>A bit more effort, better story.</small></span>
             </label>
             <label class="choice">
-              <input type="radio" name="vibe" value="Custom vibe" data-detail="She wants to set the whole vibe herself.">
+              <input type="radio" name="vibe" value="Custom vibe" data-detail="You want to set the whole vibe yourself.">
               <span><strong>Custom</strong><small>Type the mood, dress code, or any special idea below.</small></span>
             </label>
           </div>
@@ -811,12 +811,12 @@
         <section class="section">
           <div class="section-head">
             <h2>main activity?</h2>
-            <p class="hint">Optional if she wants more than just sitting and talking.</p>
+            <p class="hint">Optional if you want more than just sitting and talking.</p>
           </div>
           <div class="options" id="activityOptions"></div>
           <div class="custom-line">
             <label for="activityCustom">Custom activity</label>
-            <input class="short-field" id="activityCustom" name="activityCustom" placeholder="Example: arcade, thrift challenge, bake-off, night swim, anything she wants">
+            <input class="short-field" id="activityCustom" name="activityCustom" placeholder="Example: arcade, thrift challenge, bake-off, night swim, anything you want">
           </div>
         </section>
 
@@ -828,7 +828,7 @@
           <div class="options single" id="viewOptions"></div>
           <div class="custom-line">
             <label for="viewCustom">Custom spot</label>
-            <input class="short-field" id="viewCustom" name="viewCustom" placeholder="Example: her favourite beach, your car spot, somewhere private">
+            <input class="short-field" id="viewCustom" name="viewCustom" placeholder="Example: your favourite beach, my car spot, somewhere quiet">
           </div>
         </section>
 
@@ -840,7 +840,7 @@
           <div class="options" id="gameOptions"></div>
           <div class="custom-line">
             <label for="gameCustom">Custom game</label>
-            <input class="short-field" id="gameCustom" name="gameCustom" placeholder="Example: truth questions, dares, card game she knows, made-up scoring rules">
+            <input class="short-field" id="gameCustom" name="gameCustom" placeholder="Example: truth questions, dares, a card game you know, made-up scoring rules">
           </div>
         </section>
 
@@ -852,30 +852,30 @@
           <div class="options" id="backupOptions"></div>
           <div class="custom-line">
             <label for="backupCustom">Custom backup</label>
-            <input class="short-field" id="backupCustom" name="backupCustom" placeholder="Example: stay in, drive around, beach car park, her house, your house">
+            <input class="short-field" id="backupCustom" name="backupCustom" placeholder="Example: stay in, drive around, beach car park, yours, mine">
           </div>
         </section>
 
         <section class="section">
           <div class="section-head">
             <h2>are you free tomorrow?</h2>
-            <p class="hint">If not, she can add one or more dates that work.</p>
+            <p class="hint">If not, add one or more dates that work for you.</p>
           </div>
           <div class="options">
             <label class="choice">
-              <input type="radio" name="availability" value="Yes, tomorrow works" data-detail="She is free tomorrow." checked>
+              <input type="radio" name="availability" value="Yes, tomorrow works" data-detail="You are free tomorrow." checked>
               <span><strong>Yes, tomorrow</strong><small>Lock it in for tomorrow.</small></span>
             </label>
             <label class="choice">
-              <input type="radio" name="availability" value="No, choose other dates" data-detail="She will choose the dates she is free.">
+              <input type="radio" name="availability" value="No, choose other dates" data-detail="You will choose the dates you are free.">
               <span><strong>Not tomorrow</strong><small>Pick a few dates that work instead.</small></span>
             </label>
             <label class="choice">
-              <input type="radio" name="availability" value="Maybe tomorrow" data-detail="Tomorrow might work, but she wants backup dates too.">
+              <input type="radio" name="availability" value="Maybe tomorrow" data-detail="Tomorrow might work, but you want backup dates too.">
               <span><strong>Maybe</strong><small>Keep tomorrow as an option and add backups.</small></span>
             </label>
             <label class="choice">
-              <input type="radio" name="availability" value="Custom availability" data-detail="She wants to explain availability herself.">
+              <input type="radio" name="availability" value="Custom availability" data-detail="You want to explain availability yourself.">
               <span><strong>Custom</strong><small>Type any scheduling note below.</small></span>
             </label>
           </div>
@@ -916,8 +916,8 @@
               <span><strong>Spontaneous</strong><small>Choose the vibe now, figure out the clock later.</small></span>
             </label>
             <label class="choice">
-              <input type="radio" name="timing" value="Custom timing" data-detail="She wants to choose the timing herself.">
-              <span><strong>Custom</strong><small>She can type the time or rough plan below.</small></span>
+              <input type="radio" name="timing" value="Custom timing" data-detail="You want to choose the timing yourself.">
+              <span><strong>Custom</strong><small>You can type the time or rough plan below.</small></span>
             </label>
           </div>
           <div class="custom-line">
@@ -943,9 +943,9 @@
       </form>
 
       <aside class="sidebar">
-        <section class="result" aria-live="polite">
-          <h2>your plan</h2>
-          <p class="hint">It updates while she picks. Finish unlocks the send-back buttons.</p>
+        <section class="result" id="resultPanel" aria-live="polite" hidden>
+          <h2>our plan</h2>
+          <p class="hint">Here is what you picked. Send it back to me so I know the plan.</p>
           <div class="result-card" id="resultCard"></div>
           <div class="actions" id="shareActions" hidden>
             <button class="action" type="button" id="shareBtn">Share result</button>
@@ -966,7 +966,7 @@
       </aside>
     </div>
 
-    <p class="footer">Tip: after she taps “Make the plan”, she can use Share, SMS, Copy, or Download screenshot to send the result back. The app stores the latest finished plan on this device only.</p>
+    <p class="footer">Tip: after you tap “Make the plan”, use Share, SMS, Copy, or Download screenshot to send the result back to me. The app stores the latest finished plan on this device only.</p>
   </main>
 
   <script>
@@ -1026,25 +1026,25 @@
       },
       {
         name: "Tennis",
-        detail: "Fun if she wants a lightly competitive activity before food or sunset.",
+        detail: "Fun if you want a lightly competitive activity before food or sunset.",
         tag: "active",
         map: mapLink("tennis courts near Brookvale NSW")
       },
       {
         name: "Mini golf",
-        detail: "A little boring, but easy and unserious if she wants something simple.",
+        detail: "A little boring, but easy and unserious if you want something simple.",
         tag: "easy",
         map: mapLink("mini golf near Brookvale NSW")
       },
       {
         name: "Friend matchmaking side quest",
-        detail: "Bring her friends and your friends, then secretly try to matchmake as the side entertainment.",
+        detail: "Bring your friends and my friends, then secretly try to matchmake as the side entertainment.",
         tag: "group",
         map: mapLink("casual group activities near Brookvale NSW")
       },
       {
         name: "Arcade or bowling search",
-        detail: "If she wants something louder and less sit-down.",
+        detail: "If you want something louder and less sit-down.",
         tag: "fun",
         map: mapLink("arcade bowling near Brookvale NSW")
       },
@@ -1056,7 +1056,7 @@
       },
       {
         name: "Custom activity",
-        detail: "She wants to choose the activity herself.",
+        detail: "You want to choose the activity yourself.",
         tag: "custom",
         map: mapLink("fun activities near Brookvale NSW")
       }
@@ -1089,7 +1089,7 @@
       },
       {
         name: "Question game",
-        detail: "Cute questions, spicy questions, would-you-rather, or whatever level she chooses.",
+        detail: "Cute questions, spicy questions, would-you-rather, or whatever level you choose.",
         tag: "talking",
         map: mapLink("quiet picnic spot near Brookvale NSW")
       },
@@ -1101,7 +1101,7 @@
       },
       {
         name: "Custom game",
-        detail: "She can type any game or rule idea she wants.",
+        detail: "You can type any game or rule idea you want.",
         tag: "custom",
         map: mapLink("games near Brookvale NSW")
       }
@@ -1153,6 +1153,7 @@
     const backupOptions = document.querySelector("#backupOptions");
     const quickLinks = document.querySelector("#quickLinks");
     const resultCard = document.querySelector("#resultCard");
+    const resultPanel = document.querySelector("#resultPanel");
     const shareActions = document.querySelector("#shareActions");
     const toast = document.querySelector("#toast");
     const smsBtn = document.querySelector("#smsBtn");
@@ -1405,9 +1406,10 @@
     function finishPlan() {
       const plan = currentPlan();
       localStorage.setItem("lastDatePlan", JSON.stringify({ plan, savedAt: new Date().toISOString() }));
+      resultPanel.hidden = false;
       shareActions.hidden = false;
-      toast.textContent = "Plan made. Send it back with Share, SMS, Copy, or Download screenshot.";
-      resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      toast.textContent = "Plan made. Send it back to me with Share, SMS, Copy, or Download screenshot.";
+      resultPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     function showStep(index) {
@@ -1537,6 +1539,7 @@
         freeDates = [];
         dateInput.value = "";
         renderDates();
+        resultPanel.hidden = true;
         shareActions.hidden = true;
         toast.textContent = "";
         showStep(0);
